@@ -1,9 +1,13 @@
 package model.dao.impl;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +20,8 @@ import model.entities.Department;
 import model.entities.Seller;
 
 public class SellerDaoJDBC implements SellerDao{
+	//static Department depart;
+	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	
 private Connection conn;
 
@@ -24,7 +30,40 @@ private Connection conn;
 }
 	@Override
 	public void insert(Seller obj) {
-
+		PreparedStatement st = null;
+		
+		try {
+			st = conn.prepareStatement(
+					"INSERT INTO seller "
+					+"(Name,  Email, BirthDate, BaseSalary, DepartmentId) "
+					+ "VALUES "		
+					+ "(?,?,?,?,? )",
+					Statement.RETURN_GENERATED_KEYS);
+			st.setString(1,obj.getName());
+			st.setString(2, obj.getEmail());
+			st.setDate(3, (new java.sql.Date (obj.getBirthDate().getTime())));						
+			st.setDouble(4, obj.getBaseSalary());
+			st.setInt(5, obj.getDepartment().getId());
+			int rowsAffected  = st.executeUpdate();
+			if(rowsAffected >0) {
+				ResultSet rs = st.getGeneratedKeys();
+				if(rs.next()) {
+					int id = rs.getInt(1);
+					obj.setId(id);
+				}
+				DB.closeResultSet(rs);
+			}else {
+				throw new DbException("Erro inesperado Nenhuma linha inserirda");
+			}
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		
+		}
+	
+		
 	}
 	@Override
 	public void delete(Seller obj) {
@@ -48,6 +87,7 @@ private Connection conn;
 			DB.getConnection();
 		}
 	}
+	//retorna as linhas do banco filtrado pelo ID
 	@Override
 	public Seller  findById(Integer id){
 		PreparedStatement st = null;
@@ -94,6 +134,7 @@ private Connection conn;
 	}
 	
 	@Override
+	//retorna todoas as linhas do banco de Dados
 	public List<Seller> findAll() {
 		PreparedStatement st = null;
 		ResultSet rs = null;
@@ -102,10 +143,8 @@ private Connection conn;
 					"select seller.*,department.Name as DepName "
 					+"from seller inner join department "
 					+"ON seller.DepartmentId = department.Id "					
-					+"order by DepartmentId, Name");	
-										
-				rs = st.executeQuery();
-			
+					+"order by Name");											
+				rs = st.executeQuery();			
 				List<Seller>list  = new ArrayList<Seller>();
 				Map<Integer,Department>map = new HashMap<Integer,Department>();
 				while(rs.next()) {
@@ -173,5 +212,29 @@ private Connection conn;
 			DB.closeResultSet(rs);
 			DB.closeStatement(st);
 		}		
+	}
+	@Override
+	public Department selectDepById(Integer id) {
+		
+		PreparedStatement st =null;
+		ResultSet rs = null;
+		try {
+			st = conn.prepareStatement(
+						"SELECT * FROM Department "
+						+ "where Id = ?");
+			st.setInt(1, id);
+			rs = st.executeQuery();
+			Department depart = new Department();
+		    depart = new Department(rs.getInt("Id"),rs.getString("Name"));
+		
+			return depart;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+		
+		
 	}
 }

@@ -87,6 +87,10 @@ public class Seller implements Serializable{
 		return "Seller [id=" + id + ", name=" + name + ", email=" + email + ", birthDate=" + birthDate + ", salary="
 				+ baseSalary + ", department=" + department + "]";
 	}
+	public void setDepartmentId(int idDepart) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	
