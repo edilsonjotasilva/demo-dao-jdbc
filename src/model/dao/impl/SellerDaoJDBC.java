@@ -65,10 +65,7 @@ private Connection conn;
 	
 		
 	}
-	@Override
-	public void delete(Seller obj) {
-		// TODO Auto-generated method stub	
-	}
+
 	@Override
 	public void deleteById(Integer id) {
 		PreparedStatement st = null;
@@ -77,14 +74,17 @@ private Connection conn;
 			st =conn.prepareStatement(
 					"DELETE from seller where Id = ? "
 					);
-			st.setInt(1, 24);
+			st.setInt(1, id);
 			int rowsAffected = st.executeUpdate();
+			if(rowsAffected == 0) {
+				System.out.println("Esse ID NÃO EXISTE!");
+			}
 			System.out.println("rows Affected: "+rowsAffected);
 		}
 		 catch(SQLException e) {
 			throw new DbException(e.getMessage());
 		}finally {
-			DB.getConnection();
+			DB.closeStatement(st);
 		}
 	}
 	//retorna as linhas do banco filtrado pelo ID
