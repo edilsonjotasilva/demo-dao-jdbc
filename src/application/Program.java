@@ -94,11 +94,11 @@ public class Program {
 //		int id = sc.nextInt();
 //		seller = sellerDao.findById(id);		
 //		seller.setName("Presidente Kennedy");
-//		sellerDao.update(seller);		
+	sellerDao.update(seller);		
 //		System.out.println("Seller ID: "+ id + " Alterado");
 //		System.out.println();
 ////////////////////////////////////////////////////////////////////////
-		System.out.println("\n=== TEST 6: Seller Update ===");
+		System.out.println("\n=== TEST 6: Seller Delete ===");
 		System.out.println("Digite o Id do Seller a ser Deletado");
 		int idDelete = sc.nextInt();				
 		sellerDao.deleteById(idDelete);
